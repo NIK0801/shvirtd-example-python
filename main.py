@@ -4,6 +4,9 @@ import os
 import mysql.connector
 from datetime import datetime
 
+
+TABLE_NAME = os.getenv('TABLE_NAME', 'test_table')  # значение по умолчанию
+
 app = Flask(__name__)
 db_host=os.environ.get('DB_HOST')
 db_user=os.environ.get('DB_USER')

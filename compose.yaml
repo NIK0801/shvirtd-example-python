@@ -1,0 +1,45 @@
+version: '3.8'
+include:
+  - proxy.yaml
+x-default-service: &default_service
+  networks:
+    backend:
+      ipv4_address: ''
+  restart: always
+
+networks:
+  backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+services:
+  web:
+    <<: *default_service
+    build: .
+    image: cr.yandex/crp90qv9r0dads6iuomi/test/web-app:latest  # Или указываем сборку из Dockerfile.python
+    environment:
+      DB_HOST: db
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    networks:
+      backend:
+        ipv4_address: 172.20.0.5
+#    ports:
+#      - "8090:8000"
+    depends_on:
+      - db
+
+  db:
+    <<: *default_service
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      backend:
+        ipv4_address: 172.20.0.10
